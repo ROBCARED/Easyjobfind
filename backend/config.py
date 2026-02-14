@@ -2,8 +2,8 @@ import os
 from dotenv import load_dotenv
 from groq import Groq
 
-# Charger les variables d'environnement depuis .env (à la racine du projet)
-load_dotenv(dotenv_path="../.env")
+# Charger les variables d'environnement (depuis .env en local, via le platform en production)
+load_dotenv()
 
 # Identifiants et clés (doivent être configurées dans .env)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")

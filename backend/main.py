@@ -140,11 +140,6 @@ async def search_jobs(keyword: str):
         for j in jobs_data
     ]
 
-@app.get("/health")
-async def health_check():
-    """Endpoint de vérification de l'état du serveur"""
-    return {"status": "healthy", "version": "2.0.0"}
-
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)
