@@ -10,12 +10,13 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 FT_ID = os.getenv("FT_CLIENT_ID")
 FT_SECRET = os.getenv("FT_CLIENT_SECRET")
 
-# Validation des clés requises
+# Validation des clés requises (warning au lieu de crash pour Vercel build)
 if not GROQ_API_KEY:
-    raise ValueError("⚠️ GROQ_API_KEY manquante! Ajoutez-la dans le fichier .env")
+    import logging
+    logging.warning("⚠️ GROQ_API_KEY manquante! L'analyse IA ne fonctionnera pas.")
 
-# Initialize Groq client
-client_groq = Groq(api_key=GROQ_API_KEY)
+# Initialize Groq client (conditionnel pour éviter le crash au build)
+client_groq = Groq(api_key=GROQ_API_KEY) if GROQ_API_KEY else None
 
 # URLS API France Travail
 AUTH_URL = "https://entreprise.pole-emploi.fr/connexion/oauth2/access_token?realm=%2Fpartenaire"
