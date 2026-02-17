@@ -40,7 +40,8 @@
 	}
 
 	// URL de l'API configurable via variable d'environnement
-	const API_URL = import.meta.env.PUBLIC_API_URL || "http://localhost:8000";
+	const API_URL =
+		import.meta.env.PUBLIC_API_URL || "https://easyjobfinds.vercel.app";
 
 	async function analyzeCV() {
 		if (!file) return;
