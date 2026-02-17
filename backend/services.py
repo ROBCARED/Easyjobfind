@@ -52,17 +52,35 @@ def fetch_jobs_with_matching(profile: dict):
     competences = profile.get('competences_cles', [])
     niveau = profile.get('niveau_experience', 'junior')
     
-    # Essayer l'API France Travail d'abord
+    # Essayer l'API France Travail avec plusieurs stratégies de recherche
     token = get_ft_token()
     offres = []
     
     if token:
+        # Stratégie 1: Recherche avec le métier complet
         offres = fetch_france_travail_jobs(token, metier)
+        
+        # Stratégie 2: Si pas de résultats, essayer avec le premier mot significatif
+        if not offres and len(metier.split()) > 1:
+            premier_mot = [m for m in metier.split() if len(m) > 3]
+            if premier_mot:
+                logger.info(f"Retry recherche avec mot-clé: '{premier_mot[0]}'")
+                offres = fetch_france_travail_jobs(token, premier_mot[0])
+        
+        # Stratégie 3: Essayer avec les compétences clés
+        if not offres and competences:
+            keyword = competences[0] if competences else 'emploi'
+            logger.info(f"Retry recherche avec compétence: '{keyword}'")
+            offres = fetch_france_travail_jobs(token, keyword)
+        
+        # Stratégie 4: Recherche générique
+        if not offres:
+            logger.info("Retry recherche générique: 'emploi'")
+            offres = fetch_france_travail_jobs(token, 'emploi')
     
-    # Si pas de résultats de l'API, utiliser les données mock
     if not offres:
-        logger.warning("Aucune offre France Travail, utilisation des données mock")
-        offres = get_all_mock_jobs()
+        logger.warning("Aucune offre France Travail trouvée après toutes les stratégies")
+        return []
     
     # Calculer le score de matching pour chaque offre
     scored_jobs = []
@@ -158,9 +176,9 @@ def fetch_real_jobs(token, keyword, profile=None):
         if offres:
             return offres
     
-    # Fallback sur données mock
-    logger.warning("API France Travail indisponible, utilisation des données mock")
-    return get_realistic_mock_jobs(search_term)
+    # Pas de résultats France Travail
+    logger.warning("API France Travail indisponible ou aucun résultat")
+    return []
 
 def fetch_france_travail_jobs(token: str, keyword: str, max_results: int = 20):
     """
