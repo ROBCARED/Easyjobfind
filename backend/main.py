@@ -57,6 +57,25 @@ async def root():
 async def health_check():
     return {"status": "healthy"}
 
+@app.get("/debug")
+async def debug_check():
+    """Vérifie que les dépendances et variables d'environnement sont OK"""
+    import config as cfg
+    checks = {
+        "groq_key_loaded": cfg.GROQ_API_KEY is not None,
+        "groq_client_ready": cfg.client_groq is not None,
+        "ft_id_loaded": cfg.FT_ID is not None,
+        "ft_secret_loaded": cfg.FT_SECRET is not None,
+    }
+    try:
+        import fitz
+        checks["pymupdf_available"] = True
+        checks["pymupdf_version"] = fitz.version[0]
+    except Exception as e:
+        checks["pymupdf_available"] = False
+        checks["pymupdf_error"] = str(e)
+    return checks
+
 @app.post("/analyze", response_model=AnalyzeResponse)
 async def analyze_cv(file: UploadFile = File(...)):
     """
