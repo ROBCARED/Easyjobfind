@@ -259,10 +259,17 @@
 								<a
 									href={job.url}
 									target="_blank"
-									rel="noopener"
+									rel="noopener noreferrer"
 									class="btn btn-success apply-btn"
+									onclick={(e) => {
+										// Fallback pour mobile si le target="_blank" est bloqué
+										if (window.innerWidth < 768) {
+											e.preventDefault();
+											window.location.href = job.url;
+										}
+									}}
 								>
-									Voir l'offre
+									Voir l'offre sur France Travail
 									<svg
 										width="16"
 										height="16"
